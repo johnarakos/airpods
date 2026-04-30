@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chill-Inn | Χάρτης</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <script>
+        // Shim: expose initMap globally since module scripts don't export to window automatically
+        window.initMap = function() {
+            // Wait for module to load, then call the real initMap
+            if (window._realInitMap) {
+                window._realInitMap();
+            } else {
+                window._pendingMapInit = true;
+            }
+        };
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW7NA74YqmvijEMd3TUnxDMrmgc-gBQCE&callback=initMap&libraries=marker" async defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0d0a;
+            color: #e8d5b0;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 50;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15,13,10,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1e1a14;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: #c9a84c;
+            text-decoration: none;
+        }
+
+        .hamburger {
+            color: #e8d5b0;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        #navMenu {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 0;
+            background: #1a1714;
+            border-left: 1px solid #2a2520;
+            padding: 20px;
+            z-index: 49;
+            min-width: 180px;
+            border-radius: 0 0 0 16px;
+        }
+
+        #navMenu a {
+            display: block;
+            color: #e8d5b0;
+            text-decoration: none;
+            padding: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #2a2520;
+        }
+
+        #navMenu a:last-child { border-bottom: none; }
+        #navMenu a:hover { color: #c9a84c; }
+
+        .page-hero {
+            padding: 100px 24px 40px;
+            text-align: center;
+        }
+
+        .page-hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 40px;
+            color: #f0e6cc;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .page-hero p {
+            color: #6b5d4a;
+            font-size: 14px;
+        }
+
+        /* LEGEND */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px 24px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #9a8870;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-sleep { background-color: #c9a84c; }
+        .dot-silent { background-color: #4ca8c9; }
+        .dot-massage { background-color: #a84cc9; }
+        .dot-locker { background-color: #4a9a6b; }
+
+        /* MAP */
+        .map-container {
+            padding: 20px 24px 60px;
+        }
+
+        .airport-map {
+            background-color: #111111;
+            border: 1px solid #1e1a14;
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .map-label {
+            text-align: center;
+            color: #3a3020;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .terminals-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .zone {
+            background-color: #1a1714;
+            border: 1px solid #2a2520;
+            border-radius: 12px;
+            padding: 16px 12px;
+            flex: 1;
+        }
+
+        .zone-title {
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2520;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .zone-a .zone-title { color: #c9a84c; }
+        .zone-b .zone-title { color: #4ca8c9; }
+        .zone-c .zone-title { color: #a84cc9; }
+
+        .pod-cluster {
+            background-color: #0f0d0a;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid #2a2520;
+            transition: border-color 0.3s;
+        }
+
+        .pod-cluster:hover { border-color: #c9a84c; }
+        .pod-cluster.sleep { border-left: 2px solid #c9a84c; }
+        .pod-cluster.silent { border-left: 2px solid #4ca8c9; }
+        .pod-cluster.massage { border-left: 2px solid #a84cc9; }
+        .pod-cluster.locker { border-left: 2px solid #4a9a6b; }
+
+        .cluster-name {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .sleep .cluster-name { color: #c9a84c; }
+        .silent .cluster-name { color: #4ca8c9; }
+        .massage .cluster-name { color: #a84cc9; }
+        .locker .cluster-name { color: #4a9a6b; }
+
+        .cluster-info {
+            font-size: 10px;
+            color: #444444;
+        }
+
+        .cluster-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-top: 6px;
+        }
+
+        .pod-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 2px;
+        }
+
+        .pod-dot.sleep { background-color: #c9a84c; }
+        .pod-dot.silent { background-color: #4ca8c9; }
+        .pod-dot.massage { background-color: #a84cc9; }
+        .pod-dot.locker { background-color: #4a9a6b; }
+        .pod-dot.occupied { opacity: 0.2; }
+
+        /* TUNNEL */
+        .tunnel {
+            text-align: center;
+            color: #2a2520;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tunnel-line {
+            flex: 1;
+            height: 1px;
+            background: repeating-linear-gradient(90deg, #2a2520 0px, #2a2520 4px, transparent 4px, transparent 8px);
+        }
+
+        /* SATELLITE */
+        .satellite-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .zone-sat {
+            background-color: #1a1714;
+            border: 1px dashed #2a2520;
+            border-radius: 12px;
+            padding: 16px;
+            width: 160px;
+            text-align: center;
+        }
+
+        .zone-sat .zone-title {
+            color: #3a3020;
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .coming-soon {
+            color: #c9a84c;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        /* STATS */
+        .stats-section {
+            padding: 0 24px 60px;
+        }
+
+        .stats-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            color: #f0e6cc;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background-color: #1a1714;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1e1a14;
+        }
+
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            color: #c9a84c;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b5d4a;
+        }
+
+        /* BOOKING BTN */
+        .book-section {
+            padding: 0 24px 80px;
+            text-align: center;
+        }
+
+        .btn-gold {
+            background: #c9a84c;
+            color: #0f0d0a;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.3s;
+        }
+
+        .btn-gold:hover { opacity: 0.85; }
+
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid #1e1a14;
+            color: #3a3020;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            color: #c9a84c;
+            margin-bottom: 8px;
+        }
+
+        /* MODAL INFO */
+        .info-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .info-overlay.active { display: flex; }
+
+        .info-modal {
+            background: #1a1714;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 340px;
+            border: 1px solid #c9a84c;
+        }
+
+        .info-modal h3 {
+            font-family: 'Cormorant Garamond', serif;
+            color: #c9a84c;
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2520;
+            font-size: 13px;
+        }
+
+        .info-row:last-of-type { border-bottom: none; }
+        .info-label { color: #6b5d4a; }
+        .info-value { color: #e8d5b0; }
+
+        .btn-close-info {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: #c9a84c;
+            color: #0f0d0a;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-book-from-map {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: transparent;
+            color: #c9a84c;
+            border: 1px solid #c9a84c;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-book-from-map:hover { background: #c9a84c; color: #0f0d0a; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">≋ Chill-Inn</a>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span id="userGreeting" style="display:none; color:#c9a84c; font-size:12px;"></span>
+            <button id="logoutBtn" onclick="logout()" style="display:none; background:transparent; border:1px solid #2a2520; color:#6b5d4a; padding:6px 12px; border-radius:50px; cursor:pointer; font-size:11px; font-family:'Inter',sans-serif;">Logout</button>
+            <a id="loginBtn" href="auth.html" style="background:#c9a84c; color:#0f0d0a; padding:8px 15px; border-radius:50px; font-size:12px; text-decoration:none; font-weight:500;">Σύνδεση</a>
+            <button class="hamburger" onclick="toggleNav()">☰</button>
+        </div>
+    </header>
+
+    <div id="navMenu">
+        <a href="index.html">Αρχική</a>
+        <a href="map.html">Χάρτης</a>
+        <a href="auth.html">Σύνδεση</a>
+    </div>
+
+    <div class="page-hero">
+        <h1>🗺️ Χάρτης Pods</h1>
+        <p>Ελ. Βενιζέλος — Βρες το κοντινότερο pod σου</p>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot dot-sleep"></div><span>Sleep Pods (24)</span></div>
+        <div class="legend-item"><div class="legend-dot dot-silent"></div><span>Silent Booths (16)</span></div>
+        <div class="legend-item"><div class="legend-dot dot-massage"></div><span>Massage Pods (21)</span></div>
+        <div class="legend-item"><div class="legend-dot dot-locker"></div><span>Lockers (48)</span></div>
+    </div>
+
+    <!-- GOOGLE MAP -->
+    <div class="map-container" style="padding-bottom:0;">
+        <div style="border-radius:16px; overflow:hidden; border:1px solid #2a2520; margin-bottom:16px; position:relative;">
+            <div id="googleMap" style="width:100%; height:320px;"></div>
+            <button onclick="openNavigation()" style="position:absolute; bottom:12px; right:12px; background:#c9a84c; color:#0f0d0a; border:none; padding:10px 16px; border-radius:50px; font-size:12px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
+                🧭 Οδηγίες
+            </button>
+        </div>
+    </div>
+
+    <!-- SCHEMATIC MAP -->
+    <div class="map-container">
+        <div class="airport-map">
+
+            <div class="map-label">✈️ Main Terminal — Αναχωρήσεις</div>
+
+            <div class="terminals-row">
+
+                <!-- ZONE A -->
+                <div class="zone zone-a">
+                    <div class="zone-title">🚪 Ζώνη Α<br>Check-in</div>
+
+                    <div class="pod-cluster sleep" onclick="showInfo('sleep-a')">
+                        <div class="cluster-name">😴 Sleep — Τομέας 1</div>
+                        <div class="cluster-info">6 pods • Level 1</div>
+                        <div class="cluster-dots" id="dots-sleep-a"></div>
+                        <div id="avail-sleep-a" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                    </div>
+
+                    <div class="pod-cluster silent" onclick="showInfo('silent-a')">
+                        <div class="cluster-name">🤫 Silent — Τομέας 1</div>
+                        <div class="cluster-info">8 booths • Level 1</div>
+                        <div class="cluster-dots" id="dots-silent-a"></div>
+                        <div id="avail-silent-a" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                    </div>
+
+                    <div class="pod-cluster locker" onclick="showInfo('locker-a')">
+                        <div class="cluster-name">🧳 Lockers — Τομέας 1</div>
+                        <div class="cluster-info">12 lockers</div>
+                        <div class="cluster-dots" id="dots-locker-a"></div>
+                        <div id="avail-locker-a" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                    </div>
+                </div>
+
+                <!-- ZONE B -->
+                <div class="zone zone-b">
+                    <div class="zone-title">🌍 Ζώνη Β<br>Non-Schengen</div>
+
+                    <div class="pod-cluster sleep" onclick="showInfo('sleep-b')">
+                        <div class="cluster-name">😴 Sleep — Τομέας 2 & 3</div>
+                        <div class="cluster-info">12 pods • Gates A1-A20</div>
+                        <div class="cluster-dots" id="dots-sleep-b"></div>
+                        <div id="avail-sleep-b" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                        <div class="pod-cluster locker" style="margin-top:8px; margin-bottom:0;" onclick="event.stopPropagation(); showInfo('locker-b1')">
+                            <div class="cluster-name">🧳 Lockers</div>
+                            <div class="cluster-info">8 lockers • δίπλα στα Sleep</div>
+                            <div class="cluster-dots" id="dots-locker-b1"></div>
+                            <div id="avail-locker-b1" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                        </div>
+                    </div>
+
+                    <div class="pod-cluster silent" onclick="showInfo('silent-b')">
+                        <div class="cluster-name">🤫 Silent — Τομέας 2</div>
+                        <div class="cluster-info">8 booths • Gates A1-A20</div>
+                        <div class="cluster-dots" id="dots-silent-b"></div>
+                        <div id="avail-silent-b" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                        <div class="pod-cluster locker" style="margin-top:8px; margin-bottom:0;" onclick="event.stopPropagation(); showInfo('locker-b2')">
+                            <div class="cluster-name">🧳 Lockers</div>
+                            <div class="cluster-info">8 lockers • δίπλα στα Silent</div>
+                            <div class="cluster-dots" id="dots-locker-b2"></div>
+                            <div id="avail-locker-b2" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                        </div>
+                    </div>
+
+                    <div class="pod-cluster massage" onclick="showInfo('massage-b')">
+                        <div class="cluster-name">💆 Massage — Τομέας 1 & 2</div>
+                        <div class="cluster-info">14 pods • Gates A1-A20</div>
+                        <div class="cluster-dots" id="dots-massage-b"></div>
+                        <div id="avail-massage-b" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                        <div class="pod-cluster locker" style="margin-top:8px; margin-bottom:0;" onclick="event.stopPropagation(); showInfo('locker-b3')">
+                            <div class="cluster-name">🧳 Lockers</div>
+                            <div class="cluster-info">8 lockers • δίπλα στα Massage</div>
+                            <div class="cluster-dots" id="dots-locker-b3"></div>
+                            <div id="avail-locker-b3" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZONE C -->
+                <div class="zone zone-c">
+                    <div class="zone-title">🇪🇺 Ζώνη Γ<br>Schengen</div>
+
+                    <div class="pod-cluster sleep" onclick="showInfo('sleep-c')">
+                        <div class="cluster-name">😴 Sleep — Τομέας 4</div>
+                        <div class="cluster-info">6 pods • Gates B1-B20</div>
+                        <div class="cluster-dots" id="dots-sleep-c"></div>
+                        <div id="avail-sleep-c" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                    </div>
+
+                    <div class="pod-cluster massage" onclick="showInfo('massage-c')">
+                        <div class="cluster-name">💆 Massage — Τομέας 3</div>
+                        <div class="cluster-info">7 pods • Gates B1-B20</div>
+                        <div class="cluster-dots" id="dots-massage-c"></div>
+                        <div id="avail-massage-c" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                    </div>
+
+                    <div class="pod-cluster locker" onclick="showInfo('locker-c')">
+                        <div class="cluster-name">🧳 Lockers — Τομέας 3 & 4</div>
+                        <div class="cluster-info">12 lockers</div>
+                        <div class="cluster-dots" id="dots-locker-c"></div>
+                        <div id="avail-locker-c" style="font-size:10px; margin-top:4px; color:#4a9a6b;"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TUNNEL -->
+            <div class="tunnel">
+                <div class="tunnel-line"></div>
+                <span>🚶 Υπόγεια σήραγγα</span>
+                <div class="tunnel-line"></div>
+            </div>
+
+            <!-- SATELLITE -->
+            <div class="map-label">Satellite Terminal</div>
+            <div class="satellite-wrap">
+                <div class="zone-sat">
+                    <div class="zone-title">🛸 Satellite</div>
+                    <div class="coming-soon">— Προσεχώς —</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-section">
+        <h2 class="stats-title">Σε αριθμούς</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">Sleep Pods</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">16</div>
+                <div class="stat-label">Silent Booths</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">21</div>
+                <div class="stat-label">Massage Pods</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">36</div>
+                <div class="stat-label">Lockers</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOK BTN -->
+    <div class="book-section">
+        <a href="index.html" class="btn-gold">Κάνε Κράτηση Τώρα →</a>
+    </div>
+
+    <!-- INFO MODAL -->
+    <div class="info-overlay" id="infoOverlay">
+        <div class="info-modal">
+            <h3 id="infoTitle">—</h3>
+            <div class="info-row">
+                <span class="info-label">Ζώνη</span>
+                <span class="info-value" id="infoZone">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Pods</span>
+                <span class="info-value" id="infoPods">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Τιμή</span>
+                <span class="info-value" id="infoPrice">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Διαθέσιμα</span>
+                <span class="info-value" id="infoAvail" style="color:#4a9a6b;">—</span>
+            </div>
+            <button class="btn-close-info" onclick="closeInfo()">Κλείσιμο</button>
+            <a id="btnBookFromMap" href="#" onclick="bookFromMap(); return false;" class="btn-book-from-map">Κράτηση →</a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">Chill-Inn</div>
+        © 2026 Chill-Inn | Airport Relaxation Services
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdlffKyzFdN47et7aK3dTyStaBcYLEw0Q",
+            authDomain: "chill-inn-be1ad.firebaseapp.com",
+            projectId: "chill-inn-be1ad",
+            storageBucket: "chill-inn-be1ad.firebasestorage.app",
+            messagingSenderId: "21671839334",
+            appId: "1:21671839334:web:17ec636c61dcae34028fa7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('userGreeting').innerText = '👤 ' + (user.displayName || user.email);
+                document.getElementById('userGreeting').style.display = 'inline';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                document.getElementById('loginBtn').style.display = 'none';
+            } else {
+                document.getElementById('userGreeting').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
+        });
+
+        // Cluster config
+        const clusterInfo = {
+            'sleep-a':   { title: '😴 Sleep Pod — Τομέας 1',       zone: 'Check-in / Pre-Security',  total: 6,  price: '€15/ώρα', podType: 'Sleep Pod' },
+            'sleep-b':   { title: '😴 Sleep Pod — Τομέας 2 & 3',   zone: 'Hall A — Non-Schengen',    total: 12, price: '€15/ώρα', podType: 'Sleep Pod' },
+            'sleep-c':   { title: '😴 Sleep Pod — Τομέας 4',       zone: 'Hall B — Schengen',        total: 6,  price: '€15/ώρα', podType: 'Sleep Pod' },
+            'silent-a':  { title: '🤫 Silent Booth — Τομέας 1',    zone: 'Check-in / Pre-Security',  total: 8,  price: '€10/ώρα', podType: 'Silent Booth' },
+            'silent-b':  { title: '🤫 Silent Booth — Τομέας 2',    zone: 'Hall A — Non-Schengen',    total: 8,  price: '€10/ώρα', podType: 'Silent Booth' },
+            'massage-b': { title: '💆 Massage Pod — Τομέας 1 & 2', zone: 'Hall A — Non-Schengen',    total: 14, price: '€20/ώρα', podType: 'Massage Pod' },
+            'massage-c': { title: '💆 Massage Pod — Τομέας 3',     zone: 'Hall B — Schengen',        total: 7,  price: '€20/ώρα', podType: 'Massage Pod' },
+            'locker-a':  { title: '🧳 Lockers — Τομέας 1',         zone: 'Check-in / Pre-Security',  total: 12, price: '€5/χρήση', podType: 'Locker' },
+            'locker-b1': { title: '🧳 Lockers — δίπλα στα Sleep',  zone: 'Hall A — Non-Schengen',    total: 8,  price: '€5/χρήση', podType: 'Locker' },
+            'locker-b2': { title: '🧳 Lockers — δίπλα στα Silent', zone: 'Hall A — Non-Schengen',    total: 8,  price: '€5/χρήση', podType: 'Locker' },
+            'locker-b3': { title: '🧳 Lockers — δίπλα στα Massage',zone: 'Hall A — Non-Schengen',    total: 8,  price: '€5/χρήση', podType: 'Locker' },
+            'locker-c':  { title: '🧳 Lockers — Τομέας 3 & 4',     zone: 'Hall B — Schengen',        total: 12, price: '€5/χρήση', podType: 'Locker' },
+        };
+
+        // Fetch active bookings from Firebase and calculate availability
+        async function fetchAvailability() {
+            const now = new Date();
+            const bookingsRef = collection(db, 'bookings');
+            const snapshot = await getDocs(bookingsRef);
+
+            // Count active bookings per pod type
+            const activeCounts = {};
+            snapshot.forEach(doc => {
+                const b = doc.data();
+                // Consider booking active if it was made today
+                const bookedDate = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                const isToday = bookedDate.toDateString() === now.toDateString();
+                if (isToday) {
+                    const key = b.pod;
+                    activeCounts[key] = (activeCounts[key] || 0) + 1;
+                }
+            });
+
+            return activeCounts;
+        }
+
+        function getTypeKey(podType) {
+            if (podType === 'Sleep Pod') return 'Sleep Pod';
+            if (podType === 'Silent Booth') return 'Silent Booth';
+            if (podType === 'Massage Pod') return 'Massage Pod';
+            if (podType === 'Locker') return 'Locker';
+            return podType;
+        }
+
+        function getDotClass(podType) {
+            if (podType.includes('Sleep')) return 'sleep';
+            if (podType.includes('Silent')) return 'silent';
+            if (podType.includes('Massage')) return 'massage';
+            return 'locker';
+        }
+
+        function renderDots(clusterId, total, occupied, dotClass) {
+            const el = document.getElementById('dots-' + clusterId);
+            if (!el) return;
+            el.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const d = document.createElement('div');
+                d.className = 'pod-dot ' + dotClass + (i < occupied ? ' occupied' : '');
+                el.appendChild(d);
+            }
+        }
+
+        async function refreshMap() {
+            try {
+                const activeCounts = await fetchAvailability();
+
+                Object.entries(clusterInfo).forEach(([id, info]) => {
+                    const occupied = activeCounts[info.podType] || 0;
+                    // Distribute occupied across clusters proportionally (simple split)
+                    const clusterOccupied = Math.min(Math.round(occupied / 3), info.total);
+                    const available = Math.max(info.total - clusterOccupied, 0);
+                    const dotClass = getDotClass(info.podType);
+
+                    renderDots(id, info.total, clusterOccupied, dotClass);
+                    // Update availability badge
+                    const badge = document.getElementById('avail-' + id);
+                    if (badge) {
+                        badge.innerText = available + ' διαθέσιμα';
+                        badge.style.color = available > 2 ? '#4a9a6b' : available > 0 ? '#c9a84c' : '#c9504c';
+                    }
+                });
+
+            } catch(e) {
+                console.error('Firebase error:', e);
+            }
+        }
+
+        // Initial load + auto-refresh every 30 seconds
+        refreshMap();
+        setInterval(refreshMap, 30000);
+
+        // Google Maps
+        window._realInitMap = function() {
+            const airportCenter = { lat: 37.9364, lng: 23.9445 };
+
+            const map = new google.maps.Map(document.getElementById('googleMap'), {
+                zoom: 17,
+                center: airportCenter,
+                mapTypeId: 'roadmap',
+                mapId: 'DEMO_MAP_ID',
+                styles: [
+                    { elementType: 'geometry', stylers: [{ color: '#1a1714' }] },
+                    { elementType: 'labels.text.fill', stylers: [{ color: '#e8d5b0' }] },
+                    { elementType: 'labels.text.stroke', stylers: [{ color: '#0f0d0a' }] },
+                    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2a2520' }] },
+                    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#1a1714' }] },
+                    { featureType: 'building', elementType: 'geometry', stylers: [{ color: '#1e1a14' }] },
+                    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+                    { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2a2520' }] },
+                    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0f0d0a' }] },
+                ]
+            });
+
+            // Pod markers - based on real ATH terminal layout
+            // Main terminal center: 37.9364, 23.9445
+            // Hall A (Non-Schengen) = East wing
+            // Hall B (Schengen) = West wing
+            // Check-in = Central spine Level 1
+            const podLocations = [
+                {
+                    lat: 37.9368, lng: 23.9438,
+                    label: '🚪 Ζώνη Α — Check-in\n😴 Sleep Τομέας 1 (6 pods)\n🤫 Silent Τομέας 1 (8 booths)\n🧳 Lockers (12)',
+                    color: '#c9a84c', title: 'Check-in Area'
+                },
+                {
+                    lat: 37.9358, lng: 23.9460,
+                    label: '🌍 Ζώνη Β — Hall A (Non-Schengen)\n😴 Sleep Τομέας 2&3 (12 pods)\n🤫 Silent Τομέας 2 (8 booths)\n💆 Massage Τομέας 1&2 (14 pods)\n🧳 Lockers (24)',
+                    color: '#4ca8c9', title: 'Hall A — Non-Schengen'
+                },
+                {
+                    lat: 37.9370, lng: 23.9428,
+                    label: '🇪🇺 Ζώνη Γ — Hall B (Schengen)\n😴 Sleep Τομέας 4 (6 pods)\n💆 Massage Τομέας 3 (7 pods)\n🧳 Lockers (12)',
+                    color: '#a84cc9', title: 'Hall B — Schengen'
+                },
+                {
+                    lat: 37.9340, lng: 23.9445,
+                    label: '🛸 Satellite Terminal\n— Προσεχώς —',
+                    color: '#3a3020', title: 'Satellite Terminal'
+                },
+            ];
+
+            podLocations.forEach(loc => {
+                const marker = new google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map,
+                    title: loc.title,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 12,
+                        fillColor: loc.color,
+                        fillOpacity: 1,
+                        strokeColor: '#0f0d0a',
+                        strokeWeight: 2,
+                    }
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div style="background:#1a1714; color:#e8d5b0; padding:12px 14px; border-radius:10px; font-family:Inter,sans-serif; font-size:12px; line-height:1.8; white-space:pre-line; min-width:180px; border:1px solid ${loc.color};">${loc.label}<br><br><a href="index.html" style="color:#c9a84c; text-decoration:none; font-weight:600; font-size:13px;">Κράτηση →</a></div>`
+                });
+
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+            });
+        }
+
+        // Navigation button
+        if (window._pendingMapInit) window._realInitMap();
+
+        window.openNavigation = function() {
+            const dest = '37.9364,23.9445';
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${dest}&travelmode=driving`, '_blank');
+            } else {
+                window.open(`https://www.google.com/maps/search/Athens+International+Airport+Eleftherios+Venizelos`, '_blank');
+            }
+        }
+
+        // Show info modal
+        window.showInfo = function(id) {
+            const d = clusterInfo[id];
+            const badge = document.getElementById('avail-' + id);
+            const availText = badge ? badge.innerText : '—';
+
+            document.getElementById('infoTitle').innerText = d.title;
+            document.getElementById('infoZone').innerText = d.zone;
+            document.getElementById('infoPods').innerText = d.total + ' σύνολο';
+            document.getElementById('infoPrice').innerText = d.price;
+            document.getElementById('infoAvail').innerText = availText;
+            document.getElementById('infoAvail').style.color = badge ? badge.style.color : '#4a9a6b';
+
+            // Store podType for booking button
+            document.getElementById('btnBookFromMap').setAttribute('data-pod', d.podType);
+            document.getElementById('btnBookFromMap').setAttribute('data-price', d.price.replace('€','').replace('/ώρα','').replace('/χρήση','').trim());
+
+            document.getElementById('infoOverlay').classList.add('active');
+        }
+
+        window.closeInfo = function() {
+            document.getElementById('infoOverlay').classList.remove('active');
+        }
+
+        window.bookFromMap = function() {
+            if (!currentUser) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            window.location.href = 'index.html';
+        }
+
+        window.toggleNav = function() {
+            const nav = document.getElementById('navMenu');
+            nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+        }
+
+        window.logout = async function() {
+            const { signOut } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+            await signOut(auth);
+            window.location.href = 'auth.html';
+        }
+    </script>
+
+</body>
+</html>
