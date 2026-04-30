@@ -1250,8 +1250,20 @@
             }
 
             try {
-                // Check if THIS SPECIFIC pod number is already booked at that date+time
+                // Check if THIS SPECIFIC pod number is already booked at that date+time (excluding cancelled)
                 const q = query(
+                    collection(db, 'bookings'),
+                    where('pod', '==', currentPod),
+                    where('zone', '==', zone),
+                    where('podNumber', '==', parseInt(podNumber)),
+                    where('date', '==', date),
+                    where('time', '==', time),
+                    where('cancelled', '==', false)
+                );
+                const snapshot = await getDocs(q);
+
+                // Also check bookings that don't have cancelled field (old bookings)
+                const q2 = query(
                     collection(db, 'bookings'),
                     where('pod', '==', currentPod),
                     where('zone', '==', zone),
@@ -1259,19 +1271,21 @@
                     where('date', '==', date),
                     where('time', '==', time)
                 );
-                const snapshot = await getDocs(q);
+                const snapshot2 = await getDocs(q2);
+                // Filter out cancelled ones client-side
+                const activeBookings = snapshot2.docs.filter(d => d.data().cancelled !== true);
 
                 msg.style.display = 'block';
-                if (snapshot.size > 0) {
+                if (activeBookings.length > 0) {
                     msg.style.background = '#2a1010';
                     msg.style.color = '#c9504c';
-                    msg.innerText = '❌ Αυτό το pod είναι ήδη κλεισμένο. Επίλεξε άλλο αριθμό, ώρα ή ζώνη.';
+                    msg.innerText = 'Αυτό το pod είναι ήδη κλεισμένο. Επίλεξε άλλο αριθμό, ώρα ή ζώνη.';
                     btn.disabled = true;
                     btn.style.opacity = '0.4';
                 } else {
                     msg.style.background = '#0a1f0f';
                     msg.style.color = '#4a9a6b';
-                    msg.innerText = '✅ Διαθέσιμο! Μπορείς να προχωρήσεις.';
+                    msg.innerText = 'Διαθέσιμο! Μπορείς να προχωρήσεις.';
                     btn.disabled = false;
                     btn.style.opacity = '1';
                 }
@@ -1284,6 +1298,7 @@
             try {
                 await addDoc(collection(db, 'bookings'), {
                     ...data,
+                    cancelled: false,
                     userId: currentUser.uid,
                     userName: currentUser.displayName || currentUser.email,
                     createdAt: new Date()
