@@ -3,222 +3,1292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airport Pods</title>
+    <title>Chill-Inn | Airport Pods</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0a0a2e;
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0d0a;
+            color: #e8d5b0;
         }
 
         header {
-            background-color: #1a1a4e;
-            padding: 20px;
-        }
-
-        h1 { color: #00d4ff; }
-
-        .pods-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 50;
+            padding: 18px 24px;
             display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 50px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15,13,10,0.92);
+            backdrop-filter: blur(10px);
         }
 
-        .pod-card {
-            background-color: #1a1a4e;
-            border-radius: 15px;
-            padding: 30px;
-            width: 200px;
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: #c9a84c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
         }
 
-        .pod-card h2 { color: #00d4ff; }
-        .pod-card p { color: #aaaacc; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .pod-card button {
-            background-color: #00d4ff;
-            color: #0a0a2e;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+        #userGreeting {
+            display: none;
+            color: #c9a84c;
+            font-size: 12px;
+        }
+
+        #logoutBtn {
+            display: none;
+            background: transparent;
+            border: 1px solid #2a2520;
+            color: #6b5d4a;
+            padding: 6px 12px;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: bold;
-            margin-top: 15px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* MODAL */
+        #logoutBtn:hover { border-color: #c9a84c; color: #c9a84c; }
+
+        #loginBtn {
+            background: #c9a84c;
+            color: #0f0d0a;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .hamburger {
+            color: #e8d5b0;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        #navMenu {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 0;
+            background: #1a1714;
+            border-left: 1px solid #2a2520;
+            padding: 20px;
+            z-index: 49;
+            min-width: 200px;
+            border-radius: 0 0 0 16px;
+        }
+
+        #navMenu a {
+            display: block;
+            color: #e8d5b0;
+            text-decoration: none;
+            padding: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #2a2520;
+        }
+
+        #navMenu a:hover { color: #c9a84c; }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            padding: 2px;
+        }
+
+        .lang-btn.active, .lang-btn:hover { opacity: 1; }
+
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 60px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('images/hero.jpeg');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.35);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 24px;
+        }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 52px;
+            line-height: 1.1;
+            color: #f0e6cc;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .hero-content p {
+            font-size: 15px;
+            color: #9a8870;
+            line-height: 1.7;
+            margin-bottom: 35px;
+        }
+
+        .btn-hero {
+            background-color: #c9a84c;
+            color: #0f0d0a;
+            border: none;
+            padding: 18px 0;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.3s;
+        }
+
+        .btn-hero:hover { opacity: 0.85; }
+
+        .section {
+            padding: 70px 24px;
+            background-color: #0f0d0a;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            color: #f0e6cc;
+            text-align: center;
+            margin-bottom: 12px;
+            font-weight: 400;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #6b5d4a;
+            font-size: 14px;
+            margin-bottom: 50px;
+            line-height: 1.7;
+        }
+
+        .pods-list {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+        }
+
+        .pod-card { background-color: #0f0d0a; }
+
+        .pod-img-wrap {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .pod-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        /* Desktop: alternating image left/right */
+        @media (min-width: 768px) {
+            .pods-list { gap: 70px; }
+
+            .pod-card {
+                display: grid;
+                grid-template-columns: 380px 1fr;
+                column-gap: 50px;
+                align-items: center;
+            }
+
+            .pod-card .pod-img-wrap {
+                grid-column: 1;
+                grid-row: 1 / 5;
+                margin-bottom: 0;
+            }
+
+            .pod-card img {
+                height: 260px;
+            }
+
+            .pod-card h2          { grid-column: 2; grid-row: 1; }
+            .pod-card > p         { grid-column: 2; grid-row: 2; }
+            .pod-card .pod-footer { grid-column: 2; grid-row: 3; }
+            .pod-card .btn-view   { grid-column: 2; grid-row: 4; }
+
+            /* Even cards: image on right */
+            .pod-card:nth-child(even) {
+                grid-template-columns: 1fr 380px;
+            }
+            .pod-card:nth-child(even) .pod-img-wrap {
+                grid-column: 2;
+                grid-row: 1 / 5;
+            }
+            .pod-card:nth-child(even) h2          { grid-column: 1; grid-row: 1; }
+            .pod-card:nth-child(even) > p         { grid-column: 1; grid-row: 2; }
+            .pod-card:nth-child(even) .pod-footer { grid-column: 1; grid-row: 3; }
+            .pod-card:nth-child(even) .btn-view   { grid-column: 1; grid-row: 4; }
+        }
+
+        .pod-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: #1a1714;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 1px solid #2a2520;
+        }
+
+        .pod-card h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            color: #f0e6cc;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .pod-card p {
+            color: #6b5d4a;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .pod-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 18px;
+            border-top: 1px solid #1e1a14;
+        }
+
+        .pod-price-label {
+            font-size: 11px;
+            color: #6b5d4a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .pod-price-value {
+            font-size: 20px;
+            font-weight: 500;
+            color: #c9a84c;
+        }
+
+        .pod-price-value span {
+            font-size: 12px;
+            color: #6b5d4a;
+            font-weight: 400;
+        }
+
+        .pod-available {
+            font-size: 12px;
+            color: #4a9a6b;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .pod-available-label {
+            font-size: 11px;
+            color: #6b5d4a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: right;
+            margin-bottom: 4px;
+        }
+
+        .btn-view {
+            background: transparent;
+            color: #e8d5b0;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 0;
+            font-family: 'Inter', sans-serif;
+            border-top: 1px solid #1e1a14;
+            width: 100%;
+            margin-top: 5px;
+            transition: color 0.3s;
+        }
+
+        .btn-view:hover { color: #c9a84c; }
+
+        .exhale-section {
+            padding: 0 24px 70px;
+            background-color: #0f0d0a;
+        }
+
+        .exhale-img {
+            width: 100%;
+            border-radius: 16px;
+            height: 260px;
+            object-fit: cover;
+            object-position: center;
+            margin-bottom: 30px;
+        }
+
+        .exhale-section h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px;
+            color: #f0e6cc;
+            margin-bottom: 20px;
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        .exhale-section p {
+            color: #6b5d4a;
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .btn-outline {
+            border: 1px solid #3a3020;
+            background: transparent;
+            color: #e8d5b0;
+            padding: 16px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            margin-top: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .btn-outline:hover { border-color: #c9a84c; }
+
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.92);
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 200;
+            padding: 20px;
+            overflow-y: auto;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
-            background-color: #1a1a4e;
-            border-radius: 15px;
-            padding: 30px;
-            width: 320px;
-            text-align: left;
+            background: #1a1714;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #c9a84c;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
         }
 
-        .modal h2 { color: #00d4ff; text-align: center; }
+        .modal h2 {
+            font-family: 'Cormorant Garamond', serif;
+            color: #c9a84c;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 400;
+        }
 
         .modal label {
             display: block;
             margin-top: 15px;
-            color: #aaaacc;
-            font-size: 14px;
+            color: #6b5d4a;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .modal input, .modal select {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             margin-top: 5px;
             border-radius: 8px;
-            border: none;
-            background-color: #0a0a2e;
-            color: white;
+            border: 1px solid #2a2520;
+            background-color: #0f0d0a;
+            color: #e8d5b0;
             font-size: 14px;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
+
+        .modal input:focus, .modal select:focus { outline: none; border-color: #c9a84c; }
 
         .modal .total {
             margin-top: 20px;
             text-align: center;
-            font-size: 20px;
-            color: #00d4ff;
-            font-weight: bold;
+            font-size: 28px;
+            color: #c9a84c;
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', serif;
         }
 
-        .modal .btn-confirm {
+        .btn-confirm {
             width: 100%;
             margin-top: 20px;
-            padding: 12px;
-            background-color: #00d4ff;
-            color: #0a0a2e;
+            padding: 14px;
+            background: #c9a84c;
+            color: #0f0d0a;
             border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 14px;
             cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.3s;
         }
 
-        .modal .btn-close {
+        .btn-confirm:hover { opacity: 0.85; }
+
+        .btn-close {
             width: 100%;
             margin-top: 10px;
-            padding: 10px;
-            background-color: transparent;
-            color: #aaaacc;
-            border: 1px solid #aaaacc;
-            border-radius: 8px;
+            padding: 12px;
+            background: transparent;
+            color: #6b5d4a;
+            border: 1px solid #2a2520;
+            border-radius: 50px;
             cursor: pointer;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
         }
+
+        .btn-close:hover { border-color: #c9a84c; color: #c9a84c; }
+
+        /* SUCCESS MODAL */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .success-overlay.active { display: flex; }
+
+        .success-modal {
+            background: #1a1714;
+            border: 1px solid #c9a84c;
+            border-radius: 20px;
+            padding: 36px 28px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .success-line {
+            width: 40px;
+            height: 1px;
+            background: #c9a84c;
+            margin: 0 auto 20px;
+        }
+
+        .success-modal h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            color: #f0e6cc;
+            font-weight: 400;
+            margin-bottom: 6px;
+        }
+
+        .success-modal .success-sub {
+            color: #6b5d4a;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .success-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #1e1a14;
+        }
+
+        .success-detail-row:last-of-type { border-bottom: none; }
+
+        .success-detail-label {
+            font-size: 11px;
+            color: #6b5d4a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .success-detail-value {
+            font-size: 13px;
+            color: #e8d5b0;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .success-total {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            color: #c9a84c;
+            margin: 20px 0;
+        }
+
+        .btn-success-close {
+            width: 100%;
+            padding: 14px;
+            background: #c9a84c;
+            color: #0f0d0a;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            margin-top: 8px;
+        }
+
+        .btn-view-bookings {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            color: #6b5d4a;
+            font-size: 12px;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-view-bookings:hover { color: #c9a84c; }
+
+        .flatpickr-calendar { background: #1a1714 !important; border: 1px solid #c9a84c !important; border-radius: 10px !important; }
+        .flatpickr-day { color: #e8d5b0 !important; }
+        .flatpickr-day:hover { background: #c9a84c !important; color: #0f0d0a !important; }
+        .flatpickr-day.selected { background: #c9a84c !important; border-color: #c9a84c !important; color: #0f0d0a !important; }
+        .flatpickr-months .flatpickr-month { color: #c9a84c !important; fill: #c9a84c !important; }
+        .flatpickr-current-month { color: #c9a84c !important; }
+        .flatpickr-weekday { color: #6b5d4a !important; }
+        .numInputWrapper input { color: #e8d5b0 !important; }
+
+        footer {
+            text-align: center;
+            padding: 50px 24px;
+            border-top: 1px solid #1e1a14;
+        }
+
+        .footer-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            color: #c9a84c;
+            margin-bottom: 8px;
+        }
+
+        .footer-tagline { color: #3a3020; font-size: 12px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>✈️ Airport Pods</h1>
-        <p>Χαλάρωσε, ξεκουράσου, συνέχισε το ταξίδι σου</p>
+        <div class="logo">≋ Chill-Inn</div>
+        <div class="header-right">
+            <span id="userGreeting"></span>
+            <button id="logoutBtn" onclick="window.logout()">Logout</button>
+            <a id="loginBtn" href="auth.html" data-i18n="login">Σύνδεση</a>
+            <button class="hamburger" onclick="toggleNav()">☰</button>
+        </div>
     </header>
 
-    <div class="pods-container">
-        <div class="pod-card">
-            <h2>😴 Sleep Pod</h2>
-            <p>Ξεκουράσου πριν την πτήση σου</p>
-            <p><strong>€15/ώρα</strong></p>
-            <button onclick="openModal('Sleep Pod', 15)">Κράτηση</button>
-        </div>
-        <div class="pod-card">
-            <h2>🤫 Silent Booth</h2>
-            <p>Ησυχία για δουλειά ή χαλάρωση</p>
-            <p><strong>€10/ώρα</strong></p>
-            <button onclick="openModal('Silent Booth', 10)">Κράτηση</button>
-        </div>
-        <div class="pod-card">
-            <h2>💆 Massage Pod</h2>
-            <p>Χαλάρωσε τους μυς σου</p>
-            <p><strong>€20/ώρα</strong></p>
-            <button onclick="openModal('Massage Pod', 20)">Κράτηση</button>
+    <div id="navMenu">
+        <a href="index.html" data-i18n="nav_home">Αρχική</a>
+        <a href="map.html" data-i18n="nav_map">Χάρτης</a>
+        <a href="bookings.html">Οι Κρατήσεις μου</a>
+        <a href="auth.html" data-i18n="login">Σύνδεση</a>
+        <div style="padding:15px 0 5px; border-top:1px solid #2a2520; margin-top:5px;">
+            <div style="color:#6b5d4a; font-size:11px; letter-spacing:1px; margin-bottom:12px; text-transform:uppercase;">Γλώσσα / Language</div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button class="lang-btn active" onclick="setLang('el', event)" title="Ελληνικά">🇬🇷</button>
+                <button class="lang-btn" onclick="setLang('en', event)" title="English">🇬🇧</button>
+                <button class="lang-btn" onclick="setLang('de', event)" title="Deutsch">🇩🇪</button>
+                <button class="lang-btn" onclick="setLang('zh', event)" title="中文">🇨🇳</button>
+                <button class="lang-btn" onclick="setLang('ar', event)" title="العربية">🇸🇦</button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL -->
+    <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 data-i18n="hero_title">Βρες τη γαλήνη σου σε έναν κόσμο που κινείται.</h1>
+            <p data-i18n="hero_subtitle">Premium pods σχεδιασμένα για τον κουρασμένο ταξιδιώτη. Ένα καταφύγιο ηρεμίας, ιδιωτικότητας και ανάπαυσης μέσα στο terminal.</p>
+            <button class="btn-hero" onclick="document.querySelector('.section').scrollIntoView({behavior:'smooth'})">
+                <span data-i18n="hero_btn">Βρες Pod</span> →
+            </button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title" data-i18n="section_title">Καταφύγια για Κάθε Ανάγκη</h2>
+        <p class="section-subtitle" data-i18n="section_subtitle">Είτε χρειάζεσαι βαθύ ύπνο, απόλυτη ησυχία ή αναζωογονητικό massage, τα pods μας προσφέρουν το τέλειο περιβάλλον.</p>
+
+        <div class="pods-list">
+
+            <div class="pod-card">
+                <div class="pod-img-wrap">
+                    <img src="images/sleep-pod.jpeg" alt="Sleep Pod">
+                    <div class="pod-badge">😴</div>
+                </div>
+                <h2>Sleep Pods</h2>
+                <p data-i18n="sleep_desc">Εργονομικά pods με ρυθμιζόμενη θερμοκρασία, βαριές κουβέρτες και circadian φωτισμό. Κάθε pod διαθέτει ενσωματωμένο locker για την ασφαλή αποθήκευση της βαλίτσας σου.</p>
+                <div class="pod-footer">
+                    <div>
+                        <div class="pod-price-label" data-i18n="from">Από</div>
+                        <div class="pod-price-value">€15 <span data-i18n="per_hour">/ ώρα</span></div>
+                    </div>
+                    <div>
+                        <div class="pod-available-label" data-i18n="available_now">Διαθέσιμα Τώρα</div>
+                        <div class="pod-available">6 pods</div>
+                    </div>
+                </div>
+                <button class="btn-view" onclick="handleBooking('Sleep Pod', 15)">
+                    <span data-i18n="book_sleep">Κράτηση Sleep Pod</span> →
+                </button>
+            </div>
+
+            <div class="pod-card">
+                <div class="pod-img-wrap">
+                    <img src="images/silent-booth.jpeg" alt="Silent Booth">
+                    <div class="pod-badge">🤫</div>
+                </div>
+                <h2>Silent Booths</h2>
+                <p data-i18n="silent_desc">Ηχομονωμένοι ιδιωτικοί χώροι με υψηλής ταχύτητας Wi-Fi, εργονομικά καθίσματα και ambient φωτισμό. Ιδανικοί για εργασία ή απλά για να ξεφύγεις από τον θόρυβο.</p>
+                <div class="pod-footer">
+                    <div>
+                        <div class="pod-price-label" data-i18n="from">Από</div>
+                        <div class="pod-price-value">€10 <span data-i18n="per_hour">/ ώρα</span></div>
+                    </div>
+                    <div>
+                        <div class="pod-available-label" data-i18n="available_now">Διαθέσιμα Τώρα</div>
+                        <div class="pod-available">8 pods</div>
+                    </div>
+                </div>
+                <button class="btn-view" onclick="handleBooking('Silent Booth', 10)">
+                    <span data-i18n="book_silent">Κράτηση Silent Booth</span> →
+                </button>
+            </div>
+
+            <div class="pod-card">
+                <div class="pod-img-wrap">
+                    <img src="images/massage-pod.jpeg" alt="Massage Pod">
+                    <div class="pod-badge">💆</div>
+                </div>
+                <h2>Massage Pods</h2>
+                <p data-i18n="massage_desc">Zero-gravity massage chairs με στοχευμένη θεραπεία θερμότητας και guided meditation. Χαλάρωσε κάθε μυ πριν ή μετά την πτήση σου.</p>
+                <div class="pod-footer">
+                    <div>
+                        <div class="pod-price-label" data-i18n="from">Από</div>
+                        <div class="pod-price-value">€20 <span data-i18n="per_hour">/ ώρα</span></div>
+                    </div>
+                    <div>
+                        <div class="pod-available-label" data-i18n="available_now">Διαθέσιμα Τώρα</div>
+                        <div class="pod-available">7 pods</div>
+                    </div>
+                </div>
+                <button class="btn-view" onclick="handleBooking('Massage Pod', 20)">
+                    <span data-i18n="book_massage">Κράτηση Massage Pod</span> →
+                </button>
+            </div>
+
+            <div class="pod-card">
+                <div class="pod-img-wrap">
+                    <img src="images/lockers.jpeg" alt="Smart Lockers">
+                    <div class="pod-badge">🧳</div>
+                </div>
+                <h2>Smart Lockers</h2>
+                <p data-i18n="locker_desc">Αποθήκευσε την βαλίτσα σου με ασφάλεια και κυκλοφόρησε ελεύθερα στο αεροδρόμιο.</p>
+                <div class="pod-footer">
+                    <div>
+                        <div class="pod-price-label" data-i18n="from">Από</div>
+                        <div class="pod-price-value">€5 <span data-i18n="per_use">/ χρήση</span></div>
+                    </div>
+                    <div>
+                        <div class="pod-available-label" data-i18n="available_now">Διαθέσιμα Τώρα</div>
+                        <div class="pod-available">12 lockers</div>
+                    </div>
+                </div>
+                <button class="btn-view" onclick="handleBooking('Locker', 5)">
+                    <span data-i18n="book_locker">Κράτηση</span> →
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="exhale-section">
+        <img src="images/hero.jpeg" alt="Chill-Inn Experience" class="exhale-img">
+        <h2 data-i18n="exhale_title">Σχεδιασμένο για την ανάσα.</h2>
+        <p data-i18n="exhale_p1">Τα αεροδρόμια είναι περιβάλλοντα υψηλού στρες. Το Chill-Inn είναι η απόλυτη αντίθεση — ένας χώρος όπου το σώμα σου θυμάται πώς να χαλαρώνει.</p>
+        <p data-i18n="exhale_p2">Από την ηχομονωτική αρχιτεκτονική έως τον circadian φωτισμό, κάθε λεπτομέρεια μειώνει τους σφυγμούς σου τη στιγμή που μπαίνεις.</p>
+        <button class="btn-outline" onclick="document.querySelector('.section').scrollIntoView({behavior:'smooth'})" data-i18n="exhale_btn">Εξερεύνησε την Εμπειρία</button>
+    </div>
+
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <h2 id="modalTitle">Κράτηση</h2>
 
-            <label>Όνομα</label>
+            <!-- Ζώνη -->
+            <label>Ζώνη</label>
+            <select id="inputZone" onchange="updatePodNumbers(); checkAvailability();">
+                <option value="">— Επίλεξε Ζώνη —</option>
+                <option value="Ζώνη Α - Check-in">🚪 Ζώνη Α — Check-in</option>
+                <option value="Ζώνη Β - Hall A Non-Schengen">🌍 Ζώνη Β — Hall A (Non-Schengen)</option>
+                <option value="Ζώνη Γ - Hall B Schengen">🇪🇺 Ζώνη Γ — Hall B (Schengen)</option>
+            </select>
+
+            <!-- Αριθμός Pod -->
+            <div id="podNumberWrap">
+                <label id="podNumberLabel">Αριθμός Pod</label>
+                <select id="inputPodNumber" onchange="checkAvailability()">
+                    <option value="">— Επίλεξε πρώτα Ζώνη —</option>
+                </select>
+            </div>
+
+            <!-- Availability status -->
+            <div id="availabilityMsg" style="display:none; margin-top:8px; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:500;"></div>
+
+            <label data-i18n="modal_name">Όνομα</label>
             <input type="text" id="inputName" placeholder="Το όνομά σου">
-
-            <label>Ημερομηνία</label>
-            <input type="date" id="inputDate">
-
-            <label>Ώρα</label>
-            <input type="time" id="inputTime">
-
-            <label>Διάρκεια</label>
+            <label data-i18n="modal_date">Ημερομηνία</label>
+            <input type="text" id="inputDate" placeholder="Επίλεξε ημερομηνία" onchange="checkAvailability()">
+            <label data-i18n="modal_time">Ώρα</label>
+            <input type="text" id="inputTime" placeholder="Επίλεξε ώρα" onchange="checkAvailability()">
+            <label data-i18n="modal_duration">Διάρκεια</label>
             <select id="inputDuration" onchange="updateTotal()">
                 <option value="1">1 ώρα</option>
                 <option value="2">2 ώρες</option>
                 <option value="3">3 ώρες</option>
                 <option value="4">4 ώρες</option>
             </select>
-
+            <div id="lockerOption" style="display:none;">
+                <label data-i18n="modal_locker">Locker Βαλίτσας</label>
+                <select id="inputLocker" onchange="updateTotal()">
+                    <option value="0" data-i18n="no_locker">Χωρίς Locker</option>
+                    <option value="5">+ Locker (+€5)</option>
+                </select>
+            </div>
             <div class="total" id="totalCost">Σύνολο: €0</div>
-
-            <button class="btn-confirm" onclick="confirmBooking()">✅ Επιβεβαίωση</button>
-            <button class="btn-close" onclick="closeModal()">Άκυρο</button>
+            <button class="btn-confirm" id="btnConfirm" onclick="confirmBooking()" data-i18n="confirm_booking">Επιβεβαίωση Κράτησης</button>
+            <button class="btn-close" onclick="closeModal()" data-i18n="cancel">Άκυρο</button>
         </div>
     </div>
 
+    <!-- SUCCESS MODAL -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-modal">
+            <div class="success-line"></div>
+            <h2>Κράτηση Επιβεβαιώθηκε</h2>
+            <p class="success-sub">Σας ευχόμαστε ευχάριστη παραμονή</p>
+
+            <div class="success-detail-row">
+                <span class="success-detail-label">Pod</span>
+                <span class="success-detail-value" id="successPod">—</span>
+            </div>
+            <div class="success-detail-row">
+                <span class="success-detail-label">Ζώνη</span>
+                <span class="success-detail-value" id="successZone">—</span>
+            </div>
+            <div class="success-detail-row">
+                <span class="success-detail-label">Ημ/νία · Ώρα</span>
+                <span class="success-detail-value" id="successDate">—</span>
+            </div>
+            <div class="success-detail-row">
+                <span class="success-detail-label">Διάρκεια</span>
+                <span class="success-detail-value" id="successDuration">—</span>
+            </div>
+
+            <div class="success-total" id="successTotal">€0</div>
+
+            <button class="btn-success-close" onclick="closeSuccess()">Κλείσιμο</button>
+            <a href="bookings.html" class="btn-view-bookings">Δες τις κρατήσεις σου</a>
+        </div>
+    </div>
+
+    <footer>
+        <div style="color:#c9a84c; font-size:24px; margin-bottom:10px;">≋</div>
+        <div class="footer-logo">Chill-Inn</div>
+        <div class="footer-tagline" data-i18n="footer_tagline">Find your calm amidst the chaos.</div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/gr.js"></script>
+
     <script>
-        let currentPrice = 0;
+    const translations = {
+        el: {
+            hero_title: "Βρες τη γαλήνη σου σε έναν κόσμο που κινείται.",
+            hero_subtitle: "Premium pods σχεδιασμένα για τον κουρασμένο ταξιδιώτη. Ένα καταφύγιο ηρεμίας, ιδιωτικότητας και ανάπαυσης μέσα στο terminal.",
+            hero_btn: "Βρες Pod",
+            section_title: "Καταφύγια για Κάθε Ανάγκη",
+            section_subtitle: "Είτε χρειάζεσαι βαθύ ύπνο, απόλυτη ησυχία ή αναζωογονητικό massage, τα pods μας προσφέρουν το τέλειο περιβάλλον.",
+            sleep_desc: "Εργονομικά pods με ρυθμιζόμενη θερμοκρασία, βαριές κουβέρτες και circadian φωτισμό. Κάθε pod διαθέτει ενσωματωμένο locker για την ασφαλή αποθήκευση της βαλίτσας σου.",
+            silent_desc: "Ηχομονωμένοι ιδιωτικοί χώροι με υψηλής ταχύτητας Wi-Fi, εργονομικά καθίσματα και ambient φωτισμό. Ιδανικοί για εργασία ή απλά για να ξεφύγεις από τον θόρυβο.",
+            massage_desc: "Zero-gravity massage chairs με στοχευμένη θεραπεία θερμότητας και guided meditation. Χαλάρωσε κάθε μυ πριν ή μετά την πτήση σου.",
+            from: "Από", per_hour: "/ ώρα", per_use: "/ χρήση",
+            available_now: "Διαθέσιμα Τώρα",
+            book_sleep: "Κράτηση Sleep Pod",
+            book_silent: "Κράτηση Silent Booth",
+            book_massage: "Κράτηση Massage Pod",
+            book_locker: "Κράτηση",
+            exhale_title: "Σχεδιασμένο για την ανάσα.",
+            exhale_p1: "Τα αεροδρόμια είναι περιβάλλοντα υψηλού στρες. Το Chill-Inn είναι η απόλυτη αντίθεση — ένας χώρος όπου το σώμα σου θυμάται πώς να χαλαρώνει.",
+            exhale_p2: "Από την ηχομονωτική αρχιτεκτονική έως τον circadian φωτισμό, κάθε λεπτομέρεια μειώνει τους σφυγμούς σου τη στιγμή που μπαίνεις.",
+            exhale_btn: "Εξερεύνησε την Εμπειρία",
+            locker_desc: "Αποθήκευσε την βαλίτσα σου με ασφάλεια και κυκλοφόρησε ελεύθερα.",
+            modal_name: "Όνομα", modal_date: "Ημερομηνία", modal_time: "Ώρα",
+            modal_duration: "Διάρκεια", modal_locker: "Locker Βαλίτσας",
+            no_locker: "Χωρίς Locker",
+            confirm_booking: "Επιβεβαίωση Κράτησης",
+            cancel: "Άκυρο", login: "Σύνδεση",
+            nav_home: "Αρχική", nav_map: "Χάρτης",
+            footer_tagline: "Βρες τη γαλήνη σου μέσα στο χάος.",
+            total_label: "Σύνολο"
+        },
+        en: {
+            hero_title: "Find your still point in a turning world.",
+            hero_subtitle: "Premium wellness pods designed for the weary traveler. A sanctuary of calm, privacy, and restoration right in the terminal.",
+            hero_btn: "Find a Pod",
+            section_title: "Sanctuaries for Every Need",
+            section_subtitle: "Whether you need deep sleep, absolute silence, or restorative massage, our pods provide the perfect environment.",
+            sleep_desc: "Ergonomic pods with temperature control, weighted blankets and circadian lighting. Each pod includes a built-in locker for secure luggage storage.",
+            silent_desc: "Acoustically isolated private booths with high-speed Wi-Fi, ergonomic seating and ambient lighting. Perfect for focused work or simply escaping the terminal noise.",
+            massage_desc: "Zero-gravity massage chairs with targeted heat therapy and guided meditation programs. Release every muscle before or after your flight.",
+            from: "From", per_hour: "/ hour", per_use: "/ use",
+            available_now: "Available Now",
+            book_sleep: "Book Sleep Pod",
+            book_silent: "Book Silent Booth",
+            book_massage: "Book Massage Pod",
+            book_locker: "Book",
+            exhale_title: "Designed for the exhale.",
+            exhale_p1: "Airports are environments of high stress, bright lights, and constant motion. Chill-Inn is designed as the absolute antithesis — a space where time slows and your body remembers how to rest.",
+            exhale_p2: "From our sound-dampening architecture to our circadian-aligned lighting, every detail is engineered to lower your heart rate the moment you step inside.",
+            exhale_btn: "Explore the Experience",
+            locker_desc: "Store your luggage securely and move freely through the airport.",
+            modal_name: "Name", modal_date: "Date", modal_time: "Time",
+            modal_duration: "Duration", modal_locker: "Luggage Locker",
+            no_locker: "No Locker",
+            confirm_booking: "Confirm Booking",
+            cancel: "Cancel", login: "Sign In",
+            nav_home: "Home", nav_map: "Map",
+            footer_tagline: "Find your calm amidst the chaos.",
+            total_label: "Total"
+        },
+        de: {
+            hero_title: "Finde deine Ruhe in einer sich drehenden Welt.",
+            hero_subtitle: "Premium Wellness-Pods für den erschöpften Reisenden. Ein Refugium der Ruhe, Privatsphäre und Erholung direkt im Terminal.",
+            hero_btn: "Pod finden",
+            section_title: "Rückzugsorte für jeden Bedarf",
+            section_subtitle: "Ob Tiefschlaf, absolute Stille oder erholsame Massage — unsere Pods bieten die perfekte Umgebung.",
+            sleep_desc: "Ergonomische Pods mit Temperaturregelung, gewichteten Decken und zirkadianem Licht. Jeder Pod hat ein eingebautes Schloss für sicheres Gepäck.",
+            silent_desc: "Schallisolierte private Kabinen mit Hochgeschwindigkeits-WLAN und ergonomischen Sitzen. Ideal für konzentriertes Arbeiten oder einfach Ruhe.",
+            massage_desc: "Zero-Gravity-Massagestühle mit gezielter Wärmetherapie und geführten Meditationsprogrammen.",
+            from: "Ab", per_hour: "/ Stunde", per_use: "/ Nutzung",
+            available_now: "Jetzt verfügbar",
+            book_sleep: "Sleep Pod buchen",
+            book_silent: "Silent Booth buchen",
+            book_massage: "Massage Pod buchen",
+            book_locker: "Buchen",
+            exhale_title: "Designed für den Ausatem.",
+            exhale_p1: "Flughäfen sind Orte von Stress und Lärm. Chill-Inn ist das absolute Gegenteil — ein Ort, wo dein Körper sich an Ruhe erinnert.",
+            exhale_p2: "Von unserer schallgedämmten Architektur bis zum zirkadianen Licht ist jedes Detail darauf ausgelegt, deinen Herzschlag zu senken.",
+            exhale_btn: "Erlebnis erkunden",
+            locker_desc: "Lagere dein Gepäck sicher und bewege dich frei durch den Flughafen.",
+            modal_name: "Name", modal_date: "Datum", modal_time: "Uhrzeit",
+            modal_duration: "Dauer", modal_locker: "Gepäckschließfach",
+            no_locker: "Kein Schließfach",
+            confirm_booking: "Buchung bestätigen",
+            cancel: "Abbrechen", login: "Anmelden",
+            nav_home: "Startseite", nav_map: "Karte",
+            footer_tagline: "Finde deine Ruhe im Chaos.",
+            total_label: "Gesamt"
+        },
+        zh: {
+            hero_title: "在喧嚣的世界中，找到你的宁静。",
+            hero_subtitle: "专为疲惫旅行者设计的高级休闲舱。在航站楼内，享受宁静、私密与恢复的庇护所。",
+            hero_btn: "查找舱位",
+            section_title: "满足每种需求的休憩空间",
+            section_subtitle: "无论您需要深度睡眠、绝对安静还是恢复性按摩，我们的休闲舱都能提供完美环境。",
+            sleep_desc: "人体工程学睡眠舱，配备温控系统、加重毯和昼夜节律灯光。每个舱位均内置行李柜。",
+            silent_desc: "隔音私人工作间，配备高速Wi-Fi和人体工程学座椅。",
+            massage_desc: "零重力按摩椅，具有定向热疗和冥想引导程序。",
+            from: "起价", per_hour: "/ 小时", per_use: "/ 次",
+            available_now: "现在可用",
+            book_sleep: "预订睡眠舱",
+            book_silent: "预订静音舱",
+            book_massage: "预订按摩舱",
+            book_locker: "预订",
+            exhale_title: "为放松而设计。",
+            exhale_p1: "机场是高压力环境。Chill-Inn是绝对的对立面——一个您的身体记起如何休息的空间。",
+            exhale_p2: "从隔音建筑到昼夜节律照明，每个细节都让您一踏入就能降低心率。",
+            exhale_btn: "探索体验",
+            locker_desc: "安全存放您的行李，自由穿梭机场。",
+            modal_name: "姓名", modal_date: "日期", modal_time: "时间",
+            modal_duration: "时长", modal_locker: "行李柜",
+            no_locker: "不需要行李柜",
+            confirm_booking: "确认预订",
+            cancel: "取消", login: "登录",
+            nav_home: "首页", nav_map: "地图",
+            footer_tagline: "在喧嚣中找到您的宁静。",
+            total_label: "总计"
+        },
+        ar: {
+            hero_title: "اعثر على سكينتك في عالم لا يتوقف.",
+            hero_subtitle: "كبسولات رفاهية متميزة مصممة للمسافر المرهق. ملاذ من الهدوء والخصوصية والراحة في صالة المطار.",
+            hero_btn: "ابحث عن كبسولة",
+            section_title: "ملاجئ لكل احتياج",
+            section_subtitle: "سواء كنت تحتاج إلى نوم عميق أو صمت مطلق أو تدليك مريح، توفر كبسولاتنا البيئة المثالية.",
+            sleep_desc: "كبسولات مريحة مع تحكم في درجة الحرارة وبطانيات مثقلة. كل كبسولة تحتوي على خزانة مدمجة لأمتعتك.",
+            silent_desc: "أكشاك خاصة معزولة صوتياً مع واي فاي عالي السرعة ومقاعد مريحة.",
+            massage_desc: "كراسي تدليك بدون جاذبية مع علاج حراري موجه وبرامج تأمل إرشادية.",
+            from: "من", per_hour: "/ ساعة", per_use: "/ استخدام",
+            available_now: "متاح الآن",
+            book_sleep: "احجز كبسولة النوم",
+            book_silent: "احجز كشك الصمت",
+            book_massage: "احجز كبسولة التدليك",
+            book_locker: "احجز",
+            exhale_title: "مصمم للراحة.",
+            exhale_p1: "المطارات بيئات عالية التوتر. Chill-Inn هو النقيض المطلق — مكان تتذكر فيه جسدك كيف يرتاح.",
+            exhale_p2: "من العزل الصوتي إلى الإضاءة المتوافقة مع إيقاعك اليومي، كل تفصيل مصمم لتخفيض نبضات قلبك.",
+            exhale_btn: "استكشف التجربة",
+            locker_desc: "خزّن أمتعتك بأمان وتنقل بحرية في المطار.",
+            modal_name: "الاسم", modal_date: "التاريخ", modal_time: "الوقت",
+            modal_duration: "المدة", modal_locker: "خزانة الأمتعة",
+            no_locker: "بدون خزانة",
+            confirm_booking: "تأكيد الحجز",
+            cancel: "إلغاء", login: "تسجيل الدخول",
+            nav_home: "الرئيسية", nav_map: "الخريطة",
+            footer_tagline: "اعثر على هدوئك وسط الفوضى.",
+            total_label: "المجموع"
+        }
+    };
 
-        function openModal(podName, price) {
-            currentPrice = price;
-            document.getElementById('modalTitle').innerText = '📋 Κράτηση: ' + podName;
-            document.getElementById('totalCost').innerText = 'Σύνολο: €' + price;
-            document.getElementById('modalOverlay').classList.add('active');
+    let currentLang = 'el';
+
+    function setLang(lang, e) {
+        currentLang = lang;
+        const t = translations[lang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) el.innerText = t[key];
+        });
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        if (e && e.target) e.target.classList.add('active');
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        document.getElementById('totalCost').innerText = t.total_label + ': €0';
+        toggleNav();
+    }
+
+    function toggleNav() {
+        const nav = document.getElementById('navMenu');
+        nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+    }
+
+    let currentPrice = 0;
+    let currentPod = '';
+
+    function openModal(podName, price) {
+        currentPrice = price;
+        currentPod = podName;
+        document.getElementById('modalTitle').innerText = podName;
+        const t = translations[currentLang];
+        document.getElementById('totalCost').innerText = t.total_label + ': €' + price;
+        document.getElementById('inputDuration').value = 1;
+        document.getElementById('lockerOption').style.display = podName === 'Sleep Pod' ? 'block' : 'none';
+        document.getElementById('inputLocker').value = 0;
+        document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function updateTotal() {
+        const duration = document.getElementById('inputDuration').value;
+        const locker = parseInt(document.getElementById('inputLocker').value) || 0;
+        const total = (currentPrice * duration) + locker;
+        const t = translations[currentLang];
+        document.getElementById('totalCost').innerText = t.total_label + ': €' + total;
+    }
+
+    // Pod number labels per type
+    const podLabels = {
+        'Sleep Pod':    'Pod',
+        'Silent Booth': 'Booth',
+        'Massage Pod':  'Pod',
+        'Locker':       'Locker',
+    };
+
+    function updatePodNumbers() {
+        const zone = document.getElementById('inputZone').value;
+        const select = document.getElementById('inputPodNumber');
+        const label = document.getElementById('podNumberLabel');
+        select.innerHTML = '';
+
+        if (!zone) {
+            select.innerHTML = '<option value="">— Επίλεξε πρώτα Ζώνη —</option>';
+            return;
         }
 
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('active');
+        const capacity = (window._zoneCapacity && window._zoneCapacity[currentPod] && window._zoneCapacity[currentPod][zone]) || 0;
+        const lbl = podLabels[currentPod] || 'Pod';
+        label.innerText = 'Αριθμός ' + lbl;
+
+        if (capacity === 0) {
+            select.innerHTML = '<option value="">— Μη διαθέσιμο —</option>';
+            return;
         }
 
-        function updateTotal() {
-            const duration = document.getElementById('inputDuration').value;
-            const total = currentPrice * duration;
-            document.getElementById('totalCost').innerText = 'Σύνολο: €' + total;
+        for (let i = 1; i <= capacity; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.text = lbl + ' #' + i;
+            select.appendChild(opt);
+        }
+    }
+
+    async function confirmBooking() {
+        const name = document.getElementById('inputName').value;
+        const date = document.getElementById('inputDate').value;
+        const time = document.getElementById('inputTime').value;
+        const duration = document.getElementById('inputDuration').value;
+        const zone = document.getElementById('inputZone').value;
+        const podNumber = document.getElementById('inputPodNumber').value;
+        const locker = parseInt(document.getElementById('inputLocker').value) || 0;
+
+        if (!zone) { showError('Παρακαλώ επίλεξε Ζώνη.'); return; }
+        if (!podNumber) { showError('Παρακαλώ επίλεξε αριθμό ' + (podLabels[currentPod] || 'Pod') + '.'); return; }
+        if (!name || !date || !time) { showError('Παρακαλώ συμπλήρωσε όλα τα πεδία.'); return; }
+
+        const btn = document.getElementById('btnConfirm');
+        if (btn.disabled) { showError('Δεν υπάρχει διαθέσιμο pod για αυτή την ώρα.'); return; }
+
+        const total = (currentPrice * duration) + locker;
+        const lbl = podLabels[currentPod] || 'Pod';
+
+        if (window.saveBooking) await window.saveBooking({
+            pod: currentPod, zone, podNumber: parseInt(podNumber),
+            name, date, time, duration: parseInt(duration), locker: locker > 0, total
+        });
+
+        closeModal();
+        showSuccess({
+            pod: currentPod, lbl, podNumber, zone,
+            name, date, time, duration,
+            locker: locker > 0, total
+        });
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('availabilityMsg');
+        el.style.display = 'block';
+        el.style.background = '#2a1010';
+        el.style.color = '#c9504c';
+        el.innerText = msg;
+    }
+
+    function showSuccess(data) {
+        document.getElementById('successPod').innerText = data.pod + ' — ' + data.lbl + ' #' + data.podNumber;
+        document.getElementById('successZone').innerText = data.zone;
+        document.getElementById('successDate').innerText = data.date + ' · ' + data.time;
+        document.getElementById('successDuration').innerText = data.duration + ' ώρα(ες)' + (data.locker ? ' · Locker +€5' : '');
+        document.getElementById('successTotal').innerText = '€' + data.total;
+        document.getElementById('successOverlay').classList.add('active');
+    }
+
+    function closeSuccess() {
+        document.getElementById('successOverlay').classList.remove('active');
+    }
+
+    flatpickr("#inputDate", { locale: "gr", minDate: "today", dateFormat: "d/m/Y", disableMobile: true });
+    flatpickr("#inputTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true, disableMobile: true });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdlffKyzFdN47et7aK3dTyStaBcYLEw0Q",
+            authDomain: "chill-inn-be1ad.firebaseapp.com",
+            projectId: "chill-inn-be1ad",
+            storageBucket: "chill-inn-be1ad.firebasestorage.app",
+            messagingSenderId: "21671839334",
+            appId: "1:21671839334:web:17ec636c61dcae34028fa7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+
+        // Capacity per zone per pod type
+        const zoneCapacity = {
+            'Sleep Pod':    { 'Ζώνη Α - Check-in': 6,  'Ζώνη Β - Hall A Non-Schengen': 12, 'Ζώνη Γ - Hall B Schengen': 6  },
+            'Silent Booth': { 'Ζώνη Α - Check-in': 8,  'Ζώνη Β - Hall A Non-Schengen': 8,  'Ζώνη Γ - Hall B Schengen': 0  },
+            'Massage Pod':  { 'Ζώνη Α - Check-in': 0,  'Ζώνη Β - Hall A Non-Schengen': 14, 'Ζώνη Γ - Hall B Schengen': 7  },
+            'Locker':       { 'Ζώνη Α - Check-in': 12, 'Ζώνη Β - Hall A Non-Schengen': 24, 'Ζώνη Γ - Hall B Schengen': 12 },
+        };
+        window._zoneCapacity = zoneCapacity;
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('userGreeting').innerText = '👤 ' + (user.displayName || user.email);
+                document.getElementById('userGreeting').style.display = 'inline';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+                document.getElementById('loginBtn').style.display = 'none';
+            } else {
+                document.getElementById('userGreeting').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
+        });
+
+        window.logout = async function() {
+            await signOut(auth);
+            window.location.href = 'auth.html';
         }
 
-        function confirmBooking() {
-            const name = document.getElementById('inputName').value;
+        window.handleBooking = function(podName, price) {
+            if (!currentUser) { window.location.href = 'auth.html'; return; }
+
+            // Filter zone options based on pod type
+            const zoneSelect = document.getElementById('inputZone');
+            const capacity = zoneCapacity[podName] || {};
+            Array.from(zoneSelect.options).forEach(opt => {
+                if (opt.value === '') return;
+                const cap = capacity[opt.value] || 0;
+                opt.disabled = cap === 0;
+                opt.text = opt.text.replace(' ✗', '');
+                if (cap === 0) opt.text += ' ✗';
+            });
+            zoneSelect.value = '';
+
+            openModal(podName, price);
+        }
+
+        // Check availability for selected zone + pod number + date + time
+        window.checkAvailability = async function() {
+            const zone = document.getElementById('inputZone').value;
             const date = document.getElementById('inputDate').value;
             const time = document.getElementById('inputTime').value;
-            const duration = document.getElementById('inputDuration').value;
+            const podNumber = document.getElementById('inputPodNumber').value;
+            const msg = document.getElementById('availabilityMsg');
+            const btn = document.getElementById('btnConfirm');
 
-            if (!name || !date || !time) {
-                alert('Παρακαλώ συμπλήρωσε όλα τα πεδία!');
+            if (!zone || !date || !time || !podNumber) {
+                msg.style.display = 'none';
+                btn.disabled = false;
+                btn.style.opacity = '1';
                 return;
             }
 
-            const total = currentPrice * duration;
-            alert('✅ Η κράτησή σου επιβεβαιώθηκε!\n\nΌνομα: ' + name + '\nΗμερομηνία: ' + date + '\nΏρα: ' + time + '\nΔιάρκεια: ' + duration + ' ώρα(ες)\nΣύνολο: €' + total);
-            closeModal();
+            const capacity = (zoneCapacity[currentPod] || {})[zone] || 0;
+            if (capacity === 0) {
+                msg.style.display = 'block';
+                msg.style.background = '#2a1010';
+                msg.style.color = '#c9504c';
+                msg.innerText = '❌ Δεν υπάρχει ' + currentPod + ' σε αυτή τη ζώνη.';
+                btn.disabled = true;
+                btn.style.opacity = '0.4';
+                return;
+            }
+
+            try {
+                // Check if THIS SPECIFIC pod number is already booked at that date+time
+                const q = query(
+                    collection(db, 'bookings'),
+                    where('pod', '==', currentPod),
+                    where('zone', '==', zone),
+                    where('podNumber', '==', parseInt(podNumber)),
+                    where('date', '==', date),
+                    where('time', '==', time)
+                );
+                const snapshot = await getDocs(q);
+
+                msg.style.display = 'block';
+                if (snapshot.size > 0) {
+                    msg.style.background = '#2a1010';
+                    msg.style.color = '#c9504c';
+                    msg.innerText = '❌ Αυτό το pod είναι ήδη κλεισμένο. Επίλεξε άλλο αριθμό, ώρα ή ζώνη.';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.4';
+                } else {
+                    msg.style.background = '#0a1f0f';
+                    msg.style.color = '#4a9a6b';
+                    msg.innerText = '✅ Διαθέσιμο! Μπορείς να προχωρήσεις.';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        window.saveBooking = async function(data) {
+            try {
+                await addDoc(collection(db, 'bookings'), {
+                    ...data,
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || currentUser.email,
+                    createdAt: new Date()
+                });
+            } catch(e) { console.error(e); }
         }
     </script>
 
